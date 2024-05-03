@@ -1,10 +1,13 @@
-import { createDatabase } from "./db/database";
-import * as path from 'path'
+import {
+    createDatabase,
+    getChannelIds
+} from "./db/database";
 
 console.log("JSALStats Twitter Bot Running");
 
 console.log("Checking database...");
-createDatabase(
-    path.resolve(__dirname, './db/data.db'),
-    path.resolve(__dirname, './db/sql/createDatabase.sql'),
-)
+createDatabase()
+
+console.log('\nAll channel IDs:')
+console.log('Studio Channel IDs:', await getChannelIds(true));
+console.log('Non Studio Channel IDs:', await getChannelIds(false));
