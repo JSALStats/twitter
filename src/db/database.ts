@@ -47,7 +47,8 @@ export function createDatabase(): void {
     }
 }
 
-export function updateSubscriberCount(channelId: string, subsciberCount: number, time: number): void {
+export function updateSubscriberCount(channelId: string, subsciberCount: number): void {
+    const time = new Date().getTime()
     // Update the values in the overview table
     // Add to history
 }

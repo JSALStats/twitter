@@ -9,6 +9,8 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "twitter-api-v2": "^1.16.3",
+    "zod": "^3.23.6"
   }
 }
