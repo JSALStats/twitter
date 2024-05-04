@@ -7,7 +7,7 @@ export function getInternalSubs(): Promise<[number, number] | null> {
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
-            return response.json();
+            return response.json() as any;
         })
         .then(data => {
             const subs1 = data.UCrZKnWgOaYTTc7sc1KsVXZw;
