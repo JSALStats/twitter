@@ -1,49 +1,28 @@
-// Stores all the functionality for the database
+// Import the required modules
 import * as fs from 'fs';
-import * as sqlite3 from 'sqlite3';
-import * as path from 'path'
+import { Database } from 'bun:sqlite'; // No longer using sqlite3
+import * as path from 'path';
 
-const databaseFile = path.resolve(__dirname, './data.db')
-const createDatabaseSQLFile = path.resolve(__dirname, './sql/createDatabase.sql')
+// Define the database file path
+const databaseFile = path.resolve(__dirname, './data.db');
+const createDatabaseSQLFile = path.resolve(__dirname, './sql/createDatabase.sql');
 
-export function createDatabase(): void {
-    // Check if the database file exists
-    if (!fs.existsSync(databaseFile)) {
+// Create an async function to initialize the database
+export async function createDatabase(): Promise<void> {
+    if (fs.existsSync(databaseFile)) return;
+    try {
+        // Open the SQLite database
+        const db = new Database(databaseFile);
+
         // Read the SQL commands from createDatabase.sql file
-        fs.readFile(createDatabaseSQLFile, 'utf8', (err, sqlCommands) => {
-            if (err) {
-                console.error('Error reading SQL file:', err);
-                return;
-            }
+        const sqlCommands = fs.readFileSync(createDatabaseSQLFile, 'utf8');
 
-            // Open SQLite database
-            const db = new sqlite3.Database(databaseFile, (err) => {
-                if (err) {
-                    console.error('Error opening database:', err);
-                    return;
-                }
+        // Execute the SQL commands to create the database schema
+        await db.exec(sqlCommands);
 
-                // Execute the SQL commands to create the database schema
-                db.exec(sqlCommands, (err) => {
-                    if (err) {
-                        console.error('Error executing SQL commands:', err);
-                        return;
-                    }
-
-                    console.log('Database created successfully.');
-                });
-
-                // Close the database connection
-                db.close((err) => {
-                    if (err) {
-                        console.error('Error closing database:', err);
-                        return;
-                    }
-                });
-            });
-        });
-    } else {
-        console.log('Database already exists.');
+        console.log('Database created successfully.');
+    } catch (error) {
+        console.error('Error creating database:', error);
     }
 }
 
@@ -53,81 +32,44 @@ export function updateSubscriberCount(channelId: string, subsciberCount: number)
     // Add to history
 }
 
-export function getChannelIds(): Promise<string[]> {
-    return new Promise((resolve, reject) => {
-        // Open SQLite database
-        const db = new sqlite3.Database(databaseFile, sqlite3.OPEN_READONLY, (err) => {
-            if (err) {
-                reject(err);
-                return;
-            }
+export async function getChannelIds(): Promise<string[]> {
+    try {
+        // Open the SQLite database
+        const db = new Database(databaseFile);
 
-            // SQL statement to run
-            const sql = 'SELECT channel_id FROM overview';
+        // SQL statement to retrieve channel IDs
+        const sql = 'SELECT channel_id FROM overview';
 
-            // Execute the query
-            db.all(sql, [], (err, rows: any[]) => {
-                if (err) {
-                    reject(err);
-                    return;
-                }
-
-                // Extract channel IDs from the result rows
-                const channelIds = rows.map(row => row.channel_id);
-                resolve(channelIds);
-            });
-
-            // Close the database connection
-            db.close((err) => {
-                if (err) {
-                    console.error('Error closing database:', err);
-                }
-            });
-        });
-    });
+        // Execute the query
+        const rows = db.query(sql).values() as any;
+        
+        // Converts the response from the database into a one-dimensional array
+        return rows.flatMap((channelIds: any) => channelIds);
+    } catch (error) {
+        console.error('Error fetching channel IDs:', error);
+        return [];
+    }
 }
 
-export function getChannelSubs(channelId: string): Promise<[number, string] | null> {
-    return new Promise((resolve, reject) => {
-        // Open SQLite database
-        const db = new sqlite3.Database(databaseFile, sqlite3.OPEN_READONLY, (err) => {
-            if (err) {
-                reject(err);
-                return;
-            }
+export async function getChannelSubs(channelId: string): Promise<[number, string] | null> {
+    try {
+        // Open the SQLite database
+        const db = new Database(databaseFile);
 
-            // SQL statement to run
-            const sql = `SELECT subscriber_count, subscriber_count_hit_time 
-                         FROM overview 
-                         WHERE channel_id = ?`;
+        // SQL statement to retrieve subscriber count and time reached
+        const sql = `SELECT subscriber_count, subscriber_count_hit_time FROM overview WHERE channel_id = $channelId`;
 
-            // Execute the query
-            db.get(sql, [channelId], (err, row: any) => {
-                if (err) {
-                    reject(err);
-                    return;
-                }
+        // Execute the query
+        const row = db.query(sql).values({ $channelId: channelId}) as any;
+        
+        // If row is null, the channel ID doesn't exist in the table
+        if (!row) {
+            return null;
+        }
 
-                // If row is null, the channel ID doesn't exist in the table
-                if (!row) {
-                    resolve(null);
-                    return;
-                }
-
-                // Extract subscriber count and time reached from the row
-                const subscriberCount = row.subscriber_count;
-                const timeReached = row.subscriber_count_hit_time;
-
-                // Resolve with subscriber count and time reached
-                resolve([subscriberCount, timeReached]);
-            });
-
-            // Close the database connection
-            db.close((err) => {
-                if (err) {
-                    console.error('Error closing database:', err);
-                }
-            });
-        });
-    });
+        return row.flatMap((response: any) => response);
+    } catch (error) {
+        console.error('Error fetching channel subs:', error);
+        return null;
+    }
 }

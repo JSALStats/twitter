@@ -4,7 +4,8 @@ import './validators/env'
 
 import {
     createDatabase,
-    getChannelIds
+    getChannelIds,
+    getChannelSubs
 } from "./db/database";
 import { getSubsTask } from './utils/getSubs';
 import { sendDiscordMessage } from './utils/sendDiscordMessage';
@@ -12,12 +13,16 @@ import { sendDiscordMessage } from './utils/sendDiscordMessage';
 console.log("JSALStats Twitter Bot Running");
 
 console.log("Checking database...");
-createDatabase()
+await createDatabase()
 
 console.log('All Channel IDs:', await getChannelIds());
 
 console.log('\Updating non-internal subscriber counts!')
 await getSubsTask()
+
+console.log('\nTest sub count from db')
+const test = await getChannelSubs('UCBCuUUPr6Lo8RmmhVFySoiQ')
+console.log(test)
 
 // console.log('\nSending test message to Discord webhook!')
 // await sendDiscordMessage('Test')
