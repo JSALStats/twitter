@@ -3,7 +3,7 @@ CREATE TABLE overview (
     channel_id TEXT UNIQUE,
     lookup_id INTEGER UNIQUE,
     subscriber_count INTEGER,
-    subscriber_count_hit_time TIMESTAMP
+    subscriber_count_hit_time INTEGER
 );
 
 -- Populate the overview table

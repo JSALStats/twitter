@@ -46,4 +46,4 @@ const env: NodeJS.ProcessEnv = Object.fromEntries(
 	})
 );
 
-console.log('Environment variables seem to be correct...', env);
+console.log('Environment variables seem to be correct...');

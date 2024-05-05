@@ -6,7 +6,7 @@ const twitterClient = new TwitterApi({
     accessSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
 })
 
-export async function makeTweet(tweet: string): Promise<void> {
-    // Just a placeholder for now
-    console.log(tweet)
+export async function sendTweet(tweet: string): Promise<void> {
+    // twitterClient.v2.tweet(tweet)
+    console.log('Made a tweet!')
 }

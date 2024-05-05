@@ -1,7 +1,8 @@
 // Import the required modules
 import * as fs from 'fs';
-import { Database } from 'bun:sqlite'; // No longer using sqlite3
+import { Database } from 'bun:sqlite';
 import * as path from 'path';
+import { sendDiscordMessage } from '../utils/sendDiscordMessage';
 
 // Define the database file path
 const databaseFile = path.resolve(__dirname, './data.db');
@@ -18,17 +19,29 @@ export async function createDatabase(): Promise<void> {
         const sqlCommands = fs.readFileSync(createDatabaseSQLFile, 'utf8');
 
         // Execute the SQL commands to create the database schema
-        await db.exec(sqlCommands);
-
+        db.exec(sqlCommands);
+        
         console.log('Database created successfully.');
     } catch (error) {
         console.error('Error creating database:', error);
     }
 }
 
-export function updateSubscriberCount(channelId: string, subsciberCount: number): void {
+export async function updateSubscriberCount(channelId: string, subsciberCount: number): Promise<void> {
     const time = new Date().getTime()
+    console.log('Adding', subsciberCount, 'at', time, 'to', channelId);
+    
     // Update the values in the overview table
+    try {
+        const db = new Database(databaseFile)
+        db.query(`UPDATE overview SET subscriber_count = $subscriberCount WHERE channel_id = $channelId`).all({ $subscriberCount: subsciberCount, $channelId: channelId })
+        db.query(`UPDATE overview SET subscriber_count_hit_time = $timeHit WHERE channel_id = $channelId`).all({ $timeHit: time, $channelId: channelId })
+    }
+    catch (error) {
+        console.error(error)
+        sendDiscordMessage(error as string)
+    }
+    
     // Add to history
 }
 
@@ -42,7 +55,7 @@ export async function getChannelIds(): Promise<string[]> {
 
         // Execute the query
         const rows = db.query(sql).values() as any;
-        
+
         // Converts the response from the database into a one-dimensional array
         return rows.flatMap((channelIds: any) => channelIds);
     } catch (error) {
@@ -60,8 +73,8 @@ export async function getChannelSubs(channelId: string): Promise<[number, string
         const sql = `SELECT subscriber_count, subscriber_count_hit_time FROM overview WHERE channel_id = $channelId`;
 
         // Execute the query
-        const row = db.query(sql).values({ $channelId: channelId}) as any;
-        
+        const row = db.query(sql).values({ $channelId: channelId }) as any;
+
         // If row is null, the channel ID doesn't exist in the table
         if (!row) {
             return null;
