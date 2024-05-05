@@ -1,7 +1,7 @@
 // Using the official YouTube API
 import { getChannelIds } from "../db/database"
 
-let channels: string[] = await getChannelIds(false)
+let channels: string[] = await getChannelIds()
 let channelsJoined: string = channels.join(',')
 
 export async function getSubsTask(): Promise<void> {

@@ -6,7 +6,6 @@ import {
     createDatabase,
     getChannelIds
 } from "./db/database";
-import { getInternalSubs } from "./utils/getInteralSubs";
 import { getSubsTask } from './utils/getSubs';
 import { sendDiscordMessage } from './utils/sendDiscordMessage';
 
@@ -15,12 +14,7 @@ console.log("JSALStats Twitter Bot Running");
 console.log("Checking database...");
 createDatabase()
 
-console.log('\nAll channel IDs:')
-console.log('Studio Channel IDs:', await getChannelIds(true));
-console.log('Non Studio Channel IDs:', await getChannelIds(false));
-
-console.log("\nUpdating internal subscriber counts!")
-console.log(await getInternalSubs())
+console.log('All Channel IDs:', await getChannelIds());
 
 console.log('\Updating non-internal subscriber counts!')
 await getSubsTask()

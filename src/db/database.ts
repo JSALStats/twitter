@@ -53,7 +53,7 @@ export function updateSubscriberCount(channelId: string, subsciberCount: number)
     // Add to history
 }
 
-export function getChannelIds(wantsInternal: boolean): Promise<string[]> {
+export function getChannelIds(): Promise<string[]> {
     return new Promise((resolve, reject) => {
         // Open SQLite database
         const db = new sqlite3.Database(databaseFile, sqlite3.OPEN_READONLY, (err) => {
@@ -63,7 +63,7 @@ export function getChannelIds(wantsInternal: boolean): Promise<string[]> {
             }
 
             // SQL statement to run
-            const sql = `SELECT channel_id FROM overview WHERE is_internal = ${wantsInternal ? 1 : 0}`;
+            const sql = 'SELECT channel_id FROM overview';
 
             // Execute the query
             db.all(sql, [], (err, rows: any[]) => {
