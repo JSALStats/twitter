@@ -1,13 +1,8 @@
 // Using the official YouTube API
 import { getChannelIds } from "../db/database"
 
-let channels: string[]
-let channelsJoined: string
-
-export async function initGetSubs(): Promise<void> {
-    channels = await getChannelIds(false)
-    channelsJoined = channels.join(',')
-}
+let channels: string[] = await getChannelIds(false)
+let channelsJoined: string = channels.join(',')
 
 export async function getSubsTask(): Promise<void> {
     await fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${channelsJoined}&key=${process.env.YT_API_KEY}`)

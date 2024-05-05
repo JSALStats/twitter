@@ -7,8 +7,8 @@ import {
     getChannelIds
 } from "./db/database";
 import { getInternalSubs } from "./utils/getInteralSubs";
-import { initGetSubs } from './utils/getSubs';
 import { getSubsTask } from './utils/getSubs';
+import { sendDiscordMessage } from './utils/sendDiscordMessage';
 
 console.log("JSALStats Twitter Bot Running");
 
@@ -22,10 +22,10 @@ console.log('Non Studio Channel IDs:', await getChannelIds(false));
 console.log("\nUpdating internal subscriber counts!")
 console.log(await getInternalSubs())
 
-console.log('\nInitalizing getSubs.ts')
-await initGetSubs()
-
 console.log('\Updating non-internal subscriber counts!')
 await getSubsTask()
+
+// console.log('\nSending test message to Discord webhook!')
+// await sendDiscordMessage('Test')
 
 console.log('Time to initialize:', (performance.now() - performanceStart).toFixed(2), 'milliseconds');
