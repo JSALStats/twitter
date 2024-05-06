@@ -7,6 +7,6 @@ const twitterClient = new TwitterApi({
 })
 
 export async function sendTweet(tweet: string): Promise<void> {
-    // twitterClient.v2.tweet(tweet)
+    twitterClient.v2.tweet(tweet)
     console.log('Made a tweet!')
 }

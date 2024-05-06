@@ -7,6 +7,7 @@ let channels: string[] = await getChannelIds()
 let channelsJoined: string = channels.join(',')
 
 export async function getSubsTask(): Promise<void> {
+    console.log('\nUpdating subscriber counts!')
     await fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${channelsJoined}&key=${process.env.YT_API_KEY}`)
         .then(response => {
             if (!response.ok) {
