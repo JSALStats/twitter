@@ -1,1 +1,0 @@
-console.log("JSALStats Twitter Bot Running");
