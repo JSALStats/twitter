@@ -20,7 +20,7 @@ export async function createDatabase(): Promise<void> {
 
         // Execute the SQL commands to create the database schema
         db.exec(sqlCommands);
-        
+
         console.log('Database created successfully.');
     } catch (error) {
         console.error('Error creating database:', error);
@@ -30,19 +30,31 @@ export async function createDatabase(): Promise<void> {
 export async function updateSubscriberCount(channelId: string, subsciberCount: number): Promise<void> {
     const time = new Date().getTime()
     console.log('Adding', subsciberCount, 'at', time, 'to', channelId);
-    
+    const db = new Database(databaseFile)
+
     // Update the values in the overview table
     try {
-        const db = new Database(databaseFile)
         db.query(`UPDATE overview SET subscriber_count = $subscriberCount WHERE channel_id = $channelId`).all({ $subscriberCount: subsciberCount, $channelId: channelId })
         db.query(`UPDATE overview SET subscriber_count_hit_time = $timeHit WHERE channel_id = $channelId`).all({ $timeHit: time, $channelId: channelId })
     }
     catch (error) {
-        console.error(error)
+        console.error('Failed to update the overview table', error)
         sendDiscordMessage(error as string)
     }
-    
+
     // Add to history
+    try {
+        const row = db.query(`SELECT lookup_id FROM overview WHERE channel_id = $channelId`).values({ $channelId: channelId })
+        if (!row) {
+            throw new Error('Failed to get lookup_id')
+        }
+        const lookupId = row.flatMap((response: any) => response);
+
+        db.query(`INSERT INTO history_${lookupId} (subscriber_count, time_hit) VALUES ($subscriberCount, $timeHit)`).values({ $subscriberCount: subsciberCount, $timeHit: time })
+    } catch (error) {
+        console.error('Failed to add to the history table', error)
+        sendDiscordMessage(error as string)
+    }
 }
 
 export async function getChannelIds(): Promise<string[]> {
