@@ -19,5 +19,5 @@ console.log('\nTime to initialize:', (performance.now() - performanceStart).toFi
 
 // Start the cron job
 console.log('Starting the cron job!')
-const getSubsJob = new CronJob('*/30 * * * * *', getSubsTask)
+const getSubsJob = new CronJob('*/2 * * * * *', getSubsTask)
 getSubsJob.start()
