@@ -25,9 +25,7 @@ export async function getSubsTask(): Promise<void> {
             for (let i = 0; i < subscriberCounts.length; i++) {
                 const subsciberCount = subscriberCounts[i];
                 const channelId = channels[i];
-                console.log('\n', channelId, subsciberCount)
                 const currentSubCount = await getChannelSubs(channelId) as any
-                console.log(currentSubCount)
                 if (currentSubCount[0] < subsciberCount) {
                     console.log('An update has been detected from', currentSubCount[0], '->', subsciberCount)
                     await updateSubsTask(channelId, subsciberCount)
