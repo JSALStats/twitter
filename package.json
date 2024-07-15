@@ -12,7 +12,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "twitter-api-v2": "^1.17.1",
+    "twitter-api-v2": "^1.17.2",
     "zod": "^3.23.8"
   }
 }
